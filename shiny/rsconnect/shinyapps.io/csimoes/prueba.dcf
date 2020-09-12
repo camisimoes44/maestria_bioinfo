@@ -1,0 +1,12 @@
+name: prueba
+title:
+username:
+account: csimoes
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2733238
+bundleId: 3592367
+url: https://csimoes.shinyapps.io/prueba/
+when: 1599215230.89842
+asMultiple: FALSE
+asStatic: FALSE
