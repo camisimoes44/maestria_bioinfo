@@ -6,7 +6,7 @@ import numpy as np
 #import altair as alt
 import SessionState
 
-@st.cache 
+@st.cache(suppress_st_warning=True)
 
 def insertarLinea():
 	"""
@@ -22,8 +22,9 @@ st.set_option('deprecation.showfileUploaderEncoding', False)  # desactiva un war
 st.sidebar.write("### Menu")
 titulo_pag1 = "Stage 1 - Variant classification and expert training"
 titulo_pag2 = "Stage 2 - Variant classification by experts (training set)"
-titulo_pag3 = "Statistics"
-pagina = st.sidebar.selectbox("Please select a page:", (titulo_pag1, titulo_pag2, titulo_pag3))	
+titulo_pag3 = "Do you want to contribute a new variant?"
+titulo_pag4 = "Statistics"
+pagina = st.sidebar.selectbox("Please select a page:", (titulo_pag1, titulo_pag2, titulo_pag3, titulo_pag4))	
 st.image("logo3.png",use_column_width=True)
 #st.markdown('# Human genome sequence variant interpretation')
 
@@ -35,7 +36,7 @@ st.image("logo3.png",use_column_width=True)
 if pagina == titulo_pag1:
 	st.markdown('## ' + titulo_pag1)  # título de la página
 
-	rules = st.sidebar.button("Need to remember ACGMG rules?")
+	rules = st.sidebar.button("Need to remember ACMG rules?")
 		
 	if rules:
 		st.image("rules.png",use_column_width=True)
@@ -52,19 +53,22 @@ if pagina == titulo_pag1:
 	insertarLinea()
 
 	
-	if session_state.button_sent :  # se ejecuta cuando se clickea btn_saludar
+	if session_state.button_sent:  # se ejecuta cuando se clickea btn_saludar
 		 #st.balloons()
-	
+		
 		with st.spinner('Wait for it...'):
 			time.sleep(0.5)
 		
 		data = pd.read_csv("prueba.csv")
-		st.write(data)
+		data_s = data.sample()
+		st.write(data_s)
 		session_state.label = st.selectbox('According to the information provided above, the classification of the variant corresponds to:', ('Benign', 'Likely Benign', 'VUS', 'Likely Pathogenic', 'Pathogenic'))	
 
-		session_state.sub = st.button("Submit classification")
-		if session_state.sub:
-			st.success('Done!')
+		label = 'Pathogenic'
+		if session_state.label == label:
+			st.success('Well done!')
+		else:
+			st.error('The right classification is ' + label+ " by rule PVS1")
 
 
 	insertarLinea()
@@ -75,18 +79,49 @@ if pagina == titulo_pag1:
 ############################################################################################################################################################
 
 elif pagina == titulo_pag2:
-	with st.echo(code_location="below"):
-		st.markdown('## ' + titulo_pag2)
+	rules = st.sidebar.button("Need to remember ACMG rules?")
 		
-		uploaded_file = st.file_uploader("Elige un archivo CSV", type="csv")
-		if uploaded_file is not None:
-			data = pd.read_csv(uploaded_file)
-			st.write(data)  # muestra el DataFrame como tabla interactiva
+	if rules:
+		st.image("rules.png",use_column_width=True)
+
+	# inputs de usuario
+	session_state = SessionState.get(name="", button_sent=False)
+
+	session_state.name = st.text_input(" Enter your name ", "")
+	experience = st.selectbox(" What do you consider to be your level of expertise in the interpretation of variants?", ('Novice', 'Advanced Beginner', 'Competent', 'Proficient', 'Expert'))
+
+
+	session_state.button_sent = st.button("Load new variant")
+
+	insertarLinea()
+
+	
+	if session_state.button_sent:  # se ejecuta cuando se clickea btn_saludar
+		 #st.balloons()
+		
+		with st.spinner('Wait for it...'):
+			time.sleep(0.5)
+		
+		data = pd.read_csv("prueba.csv")
+		st.write(data)
+		session_state.label = st.selectbox('According to the information provided above, the classification of the variant corresponds to:', ('Benign', 'Likely Benign', 'VUS', 'Likely Pathogenic', 'Pathogenic'))	
+
 		insertarLinea()
 
 elif pagina == titulo_pag3:
+	st.markdown('## ' + titulo_pag3)
+		
+	uploaded_file = st.file_uploader("Select a CSV file", type="csv")
+	if uploaded_file is not None:
+		data = pd.read_csv(uploaded_file)
+		st.write(data)  # muestra el DataFrame como tabla interactiva
+	insertarLinea()
+
+
+
+elif pagina == titulo_pag4:
 	with st.echo(code_location="below"):
-		st.markdown('## ' + titulo_pag3)
+		st.markdown('## ' + titulo_pag4)
 		# st.write("Esta página está vacía")
 
 		consultar = st.button("Conectar con MySQL")
