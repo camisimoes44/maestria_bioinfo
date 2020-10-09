@@ -13,8 +13,10 @@ Developed with:
 	2. `source venv/bin/activate`
 2. Install requirements:
 	- `pip install -r requirements.txt`
-3. Configure variables in config.py
-4. Run Dash:
+3. Create config from example:
+    - `cp config.example.py config.py`
+4. Configure variables in config.py
+5. Run server:
 	- Development:
 		- `python app_server.py`
 	- Production:

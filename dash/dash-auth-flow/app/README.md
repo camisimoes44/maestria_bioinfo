@@ -11,8 +11,10 @@ Use web services from server.
 2. Install requirements:
 	- `pip install -r requirements_dash-auth-flow.txt`
 	- `pip install -r requirements.txt`
-3. Configure variables in config.py
-4. Run Dash:
+3. Create config from example:
+    - `cp config.example.py config.py`
+4. Configure variables in config.py
+5. Run Dash:
 	- Development:
 		- `python app.py`
 	- Production:

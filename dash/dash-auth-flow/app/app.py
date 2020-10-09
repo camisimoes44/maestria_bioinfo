@@ -4,9 +4,10 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 
-from flask import redirect
+# from flask import redirect
 from server import app, server
 from flask_login import logout_user, current_user
+import config
 
 # app pages
 from pages import (
@@ -108,9 +109,9 @@ def router(pathname):
     Output('user-name', 'children'),
     [Input('page-content', 'children')])
 def profile_link(content):
-    '''
+    """
     returns a navbar link to the user profile if the user is authenticated
-    '''
+    """
     if current_user.is_authenticated:
         return html.Div(current_user.first)
     else:
@@ -122,9 +123,9 @@ def profile_link(content):
      Output('user-action', 'href')],
     [Input('page-content', 'children')])
 def user_logout(input1):
-    '''
+    """
     returns a navbar link to /logout or /login, respectively, if the user is authenticated or not
-    '''
+    """
     if current_user.is_authenticated:
         return 'Logout', '/logout'
     else:
@@ -132,4 +133,4 @@ def user_logout(input1):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(host=config.server_ip, port=config.server_port, debug=config.debug)

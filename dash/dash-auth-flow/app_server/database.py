@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+This script is intended to contain all the functions to communicate with database
+"""
+
 import MySQLdb
 import config
 

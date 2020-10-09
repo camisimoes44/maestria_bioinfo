@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Main script of the server, used to publish all the routes of the API
+"""
+
 from flask import Flask, render_template, request
 
 import config
@@ -16,6 +20,7 @@ def get():
 
 @server.route('/prueba_post', methods=['POST'])
 def post():
+    x = 'empty'
     if 'x' in request.form:
         x = request.form['x']
     return {'x': x}
