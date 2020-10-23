@@ -1,3 +1,14 @@
+--
+-- Database: `bioinfo`
+--
+CREATE DATABASE IF NOT EXISTS `bioinfo` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `bioinfo`;
+
+-- --------------------------------------------------------
+
+--
+-- Structure of table `variants`
+--
 CREATE TABLE variants (
 	`Chr` DECIMAL(38, 0) NOT NULL, 
 	`Start` DECIMAL(38, 0) NOT NULL, 
@@ -227,3 +238,9 @@ CREATE TABLE variants (
 	CHECK (`BP6` IN (0, 1)), 
 	CHECK (`BP7` IN (0, 1))
 );
+
+--
+-- Add the ID column as the first one of the table `variants`.
+-- This must be done AFTER importing the CSV into MySQL.
+--
+ALTER TABLE variants ADD COLUMN `ID` int NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
