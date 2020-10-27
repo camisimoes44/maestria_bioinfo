@@ -28,7 +28,7 @@ from pages.auth_pages import (
 header = dbc.Navbar(
     dbc.Container(
         [
-            dbc.NavbarBrand("Dash Auth Flow", href="/home"),
+            dbc.NavbarBrand("Bioinformatics", href="/home"),
             dbc.Nav(
                 [
                     dbc.NavItem(dbc.NavLink("Home", href="/home")),
