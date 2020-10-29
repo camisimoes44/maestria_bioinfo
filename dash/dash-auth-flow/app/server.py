@@ -11,10 +11,10 @@ import random
 from utilities.auth import db, User as base
 from utilities.config import config, engine
 
-
+FONT_AWESOME = "https://use.fontawesome.com/releases/v5.7.2/css/all.css"
 app = dash.Dash(
     __name__,
-    external_stylesheets=[dbc.themes.BOOTSTRAP]
+    external_stylesheets=[dbc.themes.BOOTSTRAP, FONT_AWESOME]
 )
 
 server = app.server

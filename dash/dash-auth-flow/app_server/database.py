@@ -45,7 +45,8 @@ def list_variants():
     List some attributes of all the variants in database
     :return: query result (JSON)
     """
-    query = "SELECT ID, Chr, Start, End, Ref, Alt, `Func.refGene`, `Gene.refGene` FROM variants"
+    query = "SELECT ID, Chr, Start, End, Ref, Alt, `Func.refGene`, `Gene.refGene` FROM variants WHERE " \
+            "`InterVar_automated` IS NOT NULL "
     return mysql_execute_query(query)
 
 
