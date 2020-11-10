@@ -244,3 +244,81 @@ CREATE TABLE variants (
 -- This must be done AFTER importing the CSV into MySQL.
 --
 ALTER TABLE variants ADD COLUMN `ID` int NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
+
+
+--
+-- Estructura de tabla para la tabla `expertise_levels`
+--
+
+CREATE TABLE `expertise_levels` (
+  `level` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Expertise levels of the users';
+
+--
+-- Volcado de datos para la tabla `expertise_levels`
+--
+
+INSERT INTO `expertise_levels` (`level`) VALUES
+('Advanced Beginner'),
+('Competent'),
+('Expert'),
+('Novice'),
+('Proficient');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `labels`
+--
+
+CREATE TABLE `labels` (
+  `label` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Labels to apply to variant classification';
+
+--
+-- Volcado de datos para la tabla `labels`
+--
+
+INSERT INTO `labels` (`label`) VALUES
+('Benign'),
+('Likely Benign'),
+('Likely Pathogenic'),
+('Pathogenic'),
+('VUS');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_classification`
+--
+
+CREATE TABLE `user_classification` (
+  `user_ID` varchar(50) NOT NULL COMMENT 'User associated to classification',
+  `variant_ID` int(11) NOT NULL COMMENT 'Variant classified',
+  `label_ID` varchar(30) NOT NULL COMMENT 'Label applied by the user',
+  `is_correct` tinyint(1) NOT NULL COMMENT 'Classification result. If =1, the classification was correct',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Date/time of classification'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Represents the classifications of variants made by the users';
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `user_classification`
+--
+ALTER TABLE `user_classification`
+  ADD PRIMARY KEY (`user_ID`,`variant_ID`),
+  ADD KEY `FK_LabelClassification` (`label_ID`),
+  ADD KEY `FK_VariantClassification` (`variant_ID`);
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `user_classification`
+--
+ALTER TABLE `user_classification`
+  ADD CONSTRAINT `FK_LabelClassification` FOREIGN KEY (`label_ID`) REFERENCES `labels` (`label`),
+  ADD CONSTRAINT `FK_VariantClassification` FOREIGN KEY (`variant_ID`) REFERENCES `variants` (`ID`);
