@@ -19,10 +19,8 @@ login_alert = dbc.Alert(
 
 location = dcc.Location(id='page1-url', refresh=True)
 expertise_level = ['Novice', 'Advanced Beginner', 'Competent', 'Proficient', 'Expert']
-labels = ['Benign', 'Likely Benign', 'VUS', 'Likely Pathogenic', 'Pathogenic']
-expected_label = ''  # expected label (classification)of variant, to compare with user answer
+expected_label = ''  # expected label (classification) of variant, to compare with user answer
 selected_variant_id = ''  # selected variant id from the main table
-# current_user = None
 
 
 def api_request(api_route, method='GET', data=None, convert_to_df=True):
@@ -130,7 +128,7 @@ def layout():
                 html.Div(
                     id='details-container',
                     children=[
-                        html.H2(id='variant-info-title', children='Variant info', style={'font-weight': 'bold'}),
+                        html.H2(id='variant-info-title', children='Variant info', style={'fontWeight': 'bold'}),
 
                         # basic info
                         html.H3('Basic'),
@@ -145,7 +143,7 @@ def layout():
                         html.Br(),
 
                         # user classification
-                        html.H2('Your classification', style={'font-weight': 'bold'}),
+                        html.H2('Your classification', style={'fontWeight': 'bold'}),
                         html.P(
                             children='According to the information provided above, the classification of the variant '
                                      'corresponds to:'),

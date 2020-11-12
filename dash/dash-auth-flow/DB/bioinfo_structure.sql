@@ -221,6 +221,9 @@ ALTER TABLE `variants`
 ALTER TABLE `variants`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE `variants`
+  ADD INDEX(`is_conflict`);
+
 ALTER TABLE `user_classification`
   ADD CONSTRAINT `FK_LabelClassification` FOREIGN KEY (`label_ID`) REFERENCES `labels` (`label`),
   ADD CONSTRAINT `FK_VariantClassification` FOREIGN KEY (`variant_ID`) REFERENCES `variants` (`ID`);
