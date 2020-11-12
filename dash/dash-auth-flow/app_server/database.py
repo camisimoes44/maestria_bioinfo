@@ -83,13 +83,13 @@ def mysql_result_to_json(cursor):
     return simplejson.dumps(json_data)  # use simplejson to handle Decimal values
 
 
-def list_variants():
+def list_non_conflictive_variants():
     """
-    List some attributes of all the variants in the database
+    List some attributes of all the non-conflictive variants in the database
     :return: query result (JSON)
     """
     query = "SELECT ID, Chr, Start, End, Ref, Alt, `Func.refGene`, `Gene.refGene` FROM variants WHERE " \
-            "`InterVar_automated` IS NOT NULL "
+            "`InterVar_automated` IS NOT NULL AND is_conflict=0"
     return mysql_execute_query(query)
 
 

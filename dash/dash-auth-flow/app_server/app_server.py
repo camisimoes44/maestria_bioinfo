@@ -43,13 +43,13 @@ def post():
     return generate_json_response(status, data)
 
 
-@server.route('/list_variants', methods=['GET'])
-def list_variants():
+@server.route('/list_non_conflictive_variants', methods=['GET'])
+def list_non_conflictive_variants():
     """
-    List all the variants in the database
+    List all the non-conflictive variants in the database
     :return:
     """
-    status, data = db.list_variants()
+    status, data = db.list_non_conflictive_variants()
     return generate_json_response(status, data)
 
 

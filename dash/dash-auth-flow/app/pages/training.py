@@ -62,9 +62,12 @@ def api_request(api_route, method='GET', data=None, convert_to_df=True):
         return 'error', 'None'
 
 
-api_route = '/list_variants'
-status, df_variants = api_request(api_route)  # load variants when the page is loaded
+# API requests to be made when the page loads
+api_route_variants = '/list_non_conflictive_variants'
+status, df_variants = api_request(api_route_variants)  # load non-conflictive variants
 
+api_route_labels = '/list_labels'
+status_labels, df_labels = api_request(api_route_labels)  # load labels
 
 def layout():
     return dbc.Row(
@@ -74,7 +77,7 @@ def layout():
                 html.H1('Stage 1 - Variant classification and expert training'),
                 html.Br(),
 
-                html.P(children='Please select a variant from database:'),
+                html.P(children='Please select a non-conflictive variant from the list:'),
                 dash_table.DataTable(
                     id='datatable-interactivity',
                     columns=[
@@ -148,7 +151,7 @@ def layout():
                                      'corresponds to:'),
                         dcc.Dropdown(
                             id='combo-labels',
-                            options=[{'label': i, 'value': i} for i in labels],
+                            options=[{'label': i, 'value': i} for i in df_labels.label],
                             value=''
                         ),
                         html.Br(),
