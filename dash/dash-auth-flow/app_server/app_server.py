@@ -52,6 +52,15 @@ def list_non_conflictive_variants():
     status, data = db.list_non_conflictive_variants()
     return generate_json_response(status, data)
 
+@server.route('/list_conflictive_variants', methods=['GET'])
+def list_conflictive_variants():
+    """
+    List all the conflictive variants in the database
+    :return:
+    """
+    status, data = db.list_conflictive_variants()
+    return generate_json_response(status, data)
+
 
 @server.route('/list_labels', methods=['GET'])
 def list_labels():

@@ -17,6 +17,7 @@ login_alert = dbc.Alert(
     color='danger'
 )
 
+
 location = dcc.Location(id='page1-url', refresh=True)
 expertise_level = ['Novice', 'Advanced Beginner', 'Competent', 'Proficient', 'Expert']
 expected_label = ''  # expected label (classification) of variant, to compare with user answer
@@ -131,14 +132,32 @@ def layout():
                         html.H2(id='variant-info-title', children='Variant info', style={'fontWeight': 'bold'}),
 
                         # basic info
-                        html.H3('Basic'),
+                        html.H3('General'),
                         html.Div(id='variant-info-basic'),
-                        # kaviar info
-                        html.H3('Kaviar'),
-                        html.Div(id='variant-info-kaviar'),
-                        # gwava info
-                        html.H3('Gwava'),
-                        html.Div(id='variant-info-gwava'),
+                        html.Div(id='variant-info-basic2'),
+                        html.Br(),
+                        # asociations
+                        html.H3('Asociations'),
+                        # clinvar info
+                        html.H4('CLINVAR'),
+                        html.Div(id='variant-info-clinvar'),
+                        html.Div(id='variant-info-clinvar2'),
+                        html.Div(id='variant-info-clinvar3'),
+                        # OMIM info
+                        html.H4('OMIM'),
+                        html.Div(id='variant-info-omim'),
+                        # frequencies
+                        html.Br(),
+                        html.H3('Frequencies'),
+                        html.Div(id='variant-info-freq'),
+                        html.Div(id='variant-info-freq2'),
+                        html.Div(id='variant-info-freq3'),
+                        html.Div(id='variant-info-freq4'),
+                        html.Div(id='variant-info-freq5'),
+                        # scores
+                        html.Br(),
+                        html.H3('Scores'),
+                        html.Div(id='variant-info-scores1'),
                         html.Br(),
                         html.Br(),
 
@@ -188,8 +207,16 @@ def get_trigger_id():
     [
         Output('variant-info-title', 'children'),
         Output('variant-info-basic', 'children'),
-        Output('variant-info-kaviar', 'children'),
-        Output('variant-info-gwava', 'children'),
+        Output('variant-info-basic2', 'children'),
+        Output('variant-info-clinvar', 'children'),
+        Output('variant-info-clinvar2', 'children'),
+        Output('variant-info-clinvar3', 'children'),
+        Output('variant-info-omim', 'children'),
+        Output('variant-info-freq', 'children'),
+        Output('variant-info-freq2', 'children'),
+        Output('variant-info-freq3', 'children'),
+        Output('variant-info-freq4', 'children'),
+        Output('variant-info-freq5', 'children'),
         Output('details-container', 'style'),
         # Output('msg-classification-feedback', 'style'),
         # Output('btn-submit-classification', 'disabled')
@@ -234,16 +261,51 @@ def view_variant(sel_rows, n_clicks):
         basic_info = df_selected_variant.iloc[:, 0:8]
         # print('response: ', type(df_selected_variant), df_selected_variant)
         basic_table = dbc.Table.from_dataframe(basic_info, striped=True, bordered=True, hover=True)
+        
+        basic_info2 = df_selected_variant.iloc[:, 9:13]
+        # print('response: ', type(df_selected_variant), df_selected_variant)
+        basic_table2 = dbc.Table.from_dataframe(basic_info2, striped=True, bordered=True, hover=True)
 
-        # kaviar_info = df_selected_variant[['Kaviar_AF', 'Kaviar_AC', 'Kaviar_AN']]
-        kaviar_info = df_selected_variant.filter(like='Kaviar_')
-        kaviar_table = dbc.Table.from_dataframe(kaviar_info, striped=True, bordered=True, hover=True)
+        clinvar_info = df_selected_variant[['CLNALLELEID', 'CLNSIG', 'CLNREVSTAT']]
+        #kaviar_info = df_selected_variant.filter(like='Kaviar_')
+        clinvar_table = dbc.Table.from_dataframe(clinvar_info, striped=True, bordered=True, hover=True)
+        
+        clinvar_info2 = df_selected_variant[['CLNDN']]
+        #kaviar_info = df_selected_variant.filter(like='Kaviar_')
+        clinvar_table2 = dbc.Table.from_dataframe(clinvar_info2, striped=True, bordered=True, hover=True)
+        
+        clinvar_info3 = df_selected_variant[['CLNDISDB']]
+        #kaviar_info = df_selected_variant.filter(like='Kaviar_')
+        clinvar_table3 = dbc.Table.from_dataframe(clinvar_info3, striped=True, bordered=True, hover=True)
+        
+        omim_info = df_selected_variant[['MIM', 'Phenotype']]
+	#gwava_info = df_selected_variant.filter(like='GWAVA_')
+        omim_table = dbc.Table.from_dataframe(omim_info, striped=True, bordered=True, hover=True)
+	
+	
+        freq_info = df_selected_variant.iloc[:, 21:26]
+        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
+        freq_table = dbc.Table.from_dataframe(freq_info, striped=True, bordered=True, hover=True)
+        
+        freq_info2 = df_selected_variant.iloc[:, 27:34]
+        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
+        freq_table2 = dbc.Table.from_dataframe(freq_info2, striped=True, bordered=True, hover=True)
+        
+        freq_info3 = df_selected_variant.iloc[:, 35:40]
+        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
+        freq_table3 = dbc.Table.from_dataframe(freq_info3, striped=True, bordered=True, hover=True)
+        
+        freq_info4 = df_selected_variant.iloc[:, 41:45]
+        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
+        freq_table4 = dbc.Table.from_dataframe(freq_info4, striped=True, bordered=True, hover=True)
+        
+        freq_info5 = df_selected_variant.iloc[:, 46:52]
+        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
+        freq_table5 = dbc.Table.from_dataframe(freq_info5, striped=True, bordered=True, hover=True)
+        
+      
 
-        # gwava_info = df_selected_variant[['GWAVA_region_score', 'GWAVA_tss_score', 'GWAVA_unmatched_score']]
-        gwava_info = df_selected_variant.filter(like='GWAVA_')
-        gwava_table = dbc.Table.from_dataframe(gwava_info, striped=True, bordered=True, hover=True)
-
-        return [title, basic_table, kaviar_table, gwava_table, {'display': 'block'}]
+        return [title, basic_table, basic_table2, clinvar_table, clinvar_table2, clinvar_table3, omim_table, freq_table, freq_table2, freq_table3, freq_table4, freq_table5,  {'display': 'block'}]
     else:
         raise dash.exceptions.PreventUpdate  # avoid update of elements
 
