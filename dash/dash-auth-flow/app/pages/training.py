@@ -17,7 +17,6 @@ login_alert = dbc.Alert(
     color='danger'
 )
 
-
 location = dcc.Location(id='page1-url', refresh=True)
 expertise_level = ['Novice', 'Advanced Beginner', 'Competent', 'Proficient', 'Expert']
 expected_label = ''  # expected label (classification) of variant, to compare with user answer
@@ -68,6 +67,7 @@ status, df_variants = api_request(api_route_variants)  # load non-conflictive va
 api_route_labels = '/list_labels'
 status_labels, df_labels = api_request(api_route_labels)  # load labels
 
+
 def layout():
     return dbc.Row(
         dbc.Col(
@@ -80,7 +80,8 @@ def layout():
                 dash_table.DataTable(
                     id='datatable-interactivity',
                     columns=[
-                        {"name": i, "id": i, "deletable": False, "selectable": True} for i in df_variants.columns
+                        {"name": i, "id": i, "deletable": False, "selectable": True} \
+                        for i in df_variants.loc[:, df_variants.columns != 'ID'].columns
                     ],
                     data=df_variants.to_dict('records'),
                     # editable=True,
@@ -118,6 +119,7 @@ def layout():
                             'backgroundColor': 'rgb(248, 248, 248)'
                         }
                     ],
+                    # style_as_list_view=True,
                 ),
                 html.Div(id='datatable-interactivity-container'),
                 html.Br(),
