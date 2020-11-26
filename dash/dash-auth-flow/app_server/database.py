@@ -88,8 +88,9 @@ def list_non_conflictive_variants():
     List some attributes of all the non-conflictive variants in the database
     :return: query result (JSON)
     """
-    query = "SELECT ID, Chr, Start, End, Ref, Alt, `Func.refGene`, `Gene.refGene`, cytoBand FROM variants WHERE " \
-            "`CLNSIG` IS NOT NULL AND is_conflict=0"
+    query = "SELECT ID, Start, End, Ref, Alt, `AAChange.refGene`, `Func.refGene`, `ExonicFunc.refGene`, `Gene.refGene` " \
+            "FROM variants " \
+            "WHERE CLNSIG IS NOT NULL AND is_conflict=0"
     return mysql_execute_query(query)
     
     
@@ -128,6 +129,15 @@ def get_variant(id):
     :return: query result (JSON)
     """
     query = "SELECT * FROM variants WHERE ID=" + str(id)
+    return mysql_execute_query(query)
+
+
+def get_random_variant():
+    """
+    Get the data of a random variant form the database
+    :return: query result (JSON)
+    """
+    query = "SELECT * FROM variants JOIN (SELECT ID FROM variants WHERE is_conflict=0 ORDER BY RAND() LIMIT 1) as rand ON variants.ID=rand.ID"
     return mysql_execute_query(query)
 
 
