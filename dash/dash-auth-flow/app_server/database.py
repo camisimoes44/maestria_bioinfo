@@ -132,6 +132,15 @@ def get_variant(id):
     return mysql_execute_query(query)
 
 
+def get_random_variant():
+    """
+    Get the data of a random variant form the database
+    :return: query result (JSON)
+    """
+    query = "SELECT * FROM variants JOIN (SELECT ID FROM variants WHERE is_conflict=0 ORDER BY RAND() LIMIT 1) as rand ON variants.ID=rand.ID"
+    return mysql_execute_query(query)
+
+
 def set_user_classification(user_id, variant_id, label_id, is_correct):
     """
     Save to database a classification of a variant, performed by a user

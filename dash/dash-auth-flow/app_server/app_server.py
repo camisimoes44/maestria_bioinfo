@@ -23,6 +23,19 @@ def generate_json_response(status, data):
     return {"status": status, "data": data}
 
 
+def represents_int(value):
+    """
+    Check if the value represents an integer
+    :param value: value to check
+    :return: boolean
+    """
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+
+
 @server.route('/set_user_classification', methods=['POST'])
 def post():
     if 'user_id' in request.form and 'variant_id' in request.form and \
@@ -47,16 +60,17 @@ def post():
 def list_non_conflictive_variants():
     """
     List all the non-conflictive variants in the database
-    :return:
+    :return: response (JSON)
     """
     status, data = db.list_non_conflictive_variants()
     return generate_json_response(status, data)
+
 
 @server.route('/list_conflictive_variants', methods=['GET'])
 def list_conflictive_variants():
     """
     List all the conflictive variants in the database
-    :return:
+    :return: response (JSON)
     """
     status, data = db.list_conflictive_variants()
     return generate_json_response(status, data)
@@ -66,7 +80,7 @@ def list_conflictive_variants():
 def list_labels():
     """
     List all the labels in the database
-    :return:
+    :return: response (JSON)
     """
     status, data = db.list_labels()
     return generate_json_response(status, data)
@@ -76,7 +90,7 @@ def list_labels():
 def list_levels():
     """
     List all the expertise levels in the database
-    :return:
+    :return: response (JSON)
     """
     status, data = db.list_levels()
     return generate_json_response(status, data)
@@ -85,12 +99,30 @@ def list_levels():
 @server.route('/get_variant', methods=['POST'])
 def get_variant():
     """
-    Get all the attributes of a specific variant
-    :return:
+    Get all the attributes of a specific or a random variant
+    :return: response (JSON)
     """
+    error = False
     if 'variant_id' in request.form:
-        status, data = db.get_variant(request.form['variant_id'])
+        variant_id = request.form['variant_id']
+        if represents_int(variant_id):
+            variant_id = int(variant_id)
+            if variant_id == -1:
+                # random variant
+                print('> Requested a random variant')
+                status, data = db.get_random_variant()
+            elif variant_id > 0:
+                # specific variant
+                print('> Requested variant:', variant_id)
+                status, data = db.get_variant(variant_id)
+            else:
+                error = True
+        else:
+            error = True
     else:
+        error = True
+
+    if error:
         status = 'error'
         data = 'RequestError'
 

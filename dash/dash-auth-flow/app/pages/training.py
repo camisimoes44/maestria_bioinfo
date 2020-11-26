@@ -127,6 +127,12 @@ def layout():
                            n_clicks=0, color='primary'),
                 html.Br(),
                 html.Br(),
+                html.P(children='Otherwise, get a random non-conflictive variant'),
+                dbc.Button(children=html.Span([html.I(className='fas fa-random'), ' Random variant']),
+                           id='btn-random-variant',
+                           n_clicks=0, color='primary'),
+                html.Br(),
+                html.Br(),
                 html.Br(),
                 html.Div(
                     id='details-container',
@@ -226,50 +232,61 @@ def get_trigger_id():
     [
         Input('datatable-interactivity', 'selected_rows'),
         Input('btn-view-details', 'n_clicks'),
+        Input('btn-random-variant', 'n_clicks'),
         # Input('btn-submit-classification', 'n_clicks'),
         # Input('combo-labels', 'value')
     ]
 )
-def view_variant(sel_rows, n_clicks):
+def view_variant(sel_rows, n_clicks_view, n_clicks_random):
     """
     Load and display information of the selected variant
     :param sel_rows: selected rows indices
-    :param n_clicks: n clicks in the 'show info' button
+    :param n_clicks_view: n clicks in the 'show info' button
+    :param n_clicks_random: n clicks in the 'random' button
     :return: [title, table, table, table, style]
     """
     context_id = get_trigger_id()
-    print('element id:', context_id)
+    # print('element id:', context_id)
 
-    if len(sel_rows) == 1 and context_id == 'btn-view-details':
-        # avoid errors when no row is selected
-        # get variant id from initially loaded dataframe
+    if (len(sel_rows) == 1 and context_id == 'btn-view-details') or (context_id == 'btn-random-variant'):
+        # avoid errors when no row is selected, by checking length of sel_rows
+
         global selected_variant_id
-        selected_variant_id = df_variants.at[sel_rows[0], 'ID']
-        print('\nSelected variant:', selected_variant_id)
-
-        # request variant data to API
         route = '/get_variant'
         method = 'POST'
-        data = {'variant_id': int(selected_variant_id)}
-        status, df_selected_variant = api_request(route, method, data, True)
+
+        if context_id == 'btn-random-variant':
+            # request a random variant to API
+            data = {'variant_id': -1}  # set id to -1 to request a random variant
+            status, df_selected_variant = api_request(route, method, data, True)
+
+            # get the ID of the random variant
+            selected_variant_id = df_selected_variant.at[0, 'ID']
+        else:
+            # get variant id from initially loaded dataframe
+            selected_variant_id = df_variants.at[sel_rows[0], 'ID']
+            print('\nSelected variant:', selected_variant_id)
+
+            # request variant data to API
+            data = {'variant_id': int(selected_variant_id)}
+            status, df_selected_variant = api_request(route, method, data, True)
 
         global expected_label
-        expected_label = df_selected_variant.at[0, 'InterVar_automated']
+        expected_label = df_selected_variant.at[0, 'CLNSIG']
         # print('> expected label is:', expected_label, type(expected_label))
 
         # prepare variant info to display
         title = 'Info of variant: ' + str(selected_variant_id)
 
+        # Basic info
         basic_info = df_selected_variant.iloc[:, 0:8]
-        # print('response: ', type(df_selected_variant), df_selected_variant)
         basic_table = dbc.Table.from_dataframe(basic_info, striped=True, bordered=True, hover=True)
         
         basic_info2 = df_selected_variant.iloc[:, 9:13]
-        # print('response: ', type(df_selected_variant), df_selected_variant)
         basic_table2 = dbc.Table.from_dataframe(basic_info2, striped=True, bordered=True, hover=True)
 
+        # Associations info
         clinvar_info = df_selected_variant[['CLNALLELEID', 'CLNSIG', 'CLNREVSTAT']]
-        #kaviar_info = df_selected_variant.filter(like='Kaviar_')
         clinvar_table = dbc.Table.from_dataframe(clinvar_info, striped=True, bordered=True, hover=True)
         
         clinvar_info2 = df_selected_variant[['CLNDN']]
@@ -277,35 +294,26 @@ def view_variant(sel_rows, n_clicks):
         clinvar_table2 = dbc.Table.from_dataframe(clinvar_info2, striped=True, bordered=True, hover=True)
         
         clinvar_info3 = df_selected_variant[['CLNDISDB']]
-        #kaviar_info = df_selected_variant.filter(like='Kaviar_')
         clinvar_table3 = dbc.Table.from_dataframe(clinvar_info3, striped=True, bordered=True, hover=True)
         
         omim_info = df_selected_variant[['MIM', 'Phenotype']]
-	#gwava_info = df_selected_variant.filter(like='GWAVA_')
         omim_table = dbc.Table.from_dataframe(omim_info, striped=True, bordered=True, hover=True)
-	
-	
+
+        # Frequencies info
         freq_info = df_selected_variant.iloc[:, 21:26]
-        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
         freq_table = dbc.Table.from_dataframe(freq_info, striped=True, bordered=True, hover=True)
         
         freq_info2 = df_selected_variant.iloc[:, 27:34]
-        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
         freq_table2 = dbc.Table.from_dataframe(freq_info2, striped=True, bordered=True, hover=True)
         
         freq_info3 = df_selected_variant.iloc[:, 35:40]
-        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
         freq_table3 = dbc.Table.from_dataframe(freq_info3, striped=True, bordered=True, hover=True)
         
         freq_info4 = df_selected_variant.iloc[:, 41:45]
-        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
         freq_table4 = dbc.Table.from_dataframe(freq_info4, striped=True, bordered=True, hover=True)
         
         freq_info5 = df_selected_variant.iloc[:, 46:52]
-        #kaviar_info2 = df_selected_variant.filter(like='Kaviar_')
         freq_table5 = dbc.Table.from_dataframe(freq_info5, striped=True, bordered=True, hover=True)
-        
-      
 
         return [title, basic_table, basic_table2, clinvar_table, clinvar_table2, clinvar_table3, omim_table, freq_table, freq_table2, freq_table3, freq_table4, freq_table5,  {'display': 'block'}]
     else:
