@@ -5,12 +5,13 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
 import pandas as pd
-import requests
+# import requests
+import common
 from dash.dependencies import Output, Input
 from server import app
 from dash import no_update
 from flask_login import logout_user, current_user
-import json
+# import json
 
 login_alert = dbc.Alert(
     'User not logged in. Taking you to login.',
@@ -22,50 +23,12 @@ expertise_level = ['Novice', 'Advanced Beginner', 'Competent', 'Proficient', 'Ex
 expected_label = ''  # expected label (classification) of variant, to compare with user answer
 selected_variant_id = ''  # selected variant id from the main table
 
-
-def api_request(api_route, method='GET', data=None, convert_to_df=True):
-    """
-    Perform a request to the given API route
-    :param api_route: api route to send request (string)
-    :param method: request method
-    :param data: data to append to request (dict)
-    :param convert_to_df: convert response (boolean). True=Pandas DataFrame, False=JSON
-    :return: response (Pandas DataFrame/JSON)
-    """
-    if data is None:
-        data = {}
-    api_url = config.api_url + api_route
-
-    try:
-        response = None
-        if method.upper() == 'GET':
-            response = requests.get(api_url)
-        elif method.upper() == 'POST':
-            response = requests.post(api_url, data=data)
-    except requests.exceptions.ConnectionError:
-        print("ERROR: Couldn't connect to API. Please try again.")
-        return 'error', "APIError"
-
-    if response.status_code == 200:
-        decoded_response = response.content.decode('utf-8')
-        response_status = json.loads(decoded_response)['status']
-        response_data = json.loads(decoded_response)['data']
-        if convert_to_df:
-            # data_df = pd.DataFrame.from_dict(json.loads(decoded_response), orient='index')
-            response_data_df = pd.read_json(response_data)
-            return response_status, response_data_df
-        else:
-            return response_status, response_data
-    else:
-        return 'error', 'None'
-
-
 # API requests to be made when the page loads
-api_route_variants = '/list_non_conflictive_variants'
-status, df_variants = api_request(api_route_variants)  # load non-conflictive variants
+api_route_variants = '/variants/nonconf'
+status, df_variants = common.api_request(api_route_variants)  # load non-conflictive variants
 
-api_route_labels = '/list_labels'
-status_labels, df_labels = api_request(api_route_labels)  # load labels
+api_route_labels = '/labels'
+status_labels, df_labels = common.api_request(api_route_labels)  # load labels
 
 
 def layout():
@@ -252,13 +215,14 @@ def view_variant(sel_rows, n_clicks_view, n_clicks_random):
         # avoid errors when no row is selected, by checking length of sel_rows
 
         global selected_variant_id
-        route = '/get_variant'
-        method = 'POST'
+        route = '/variants'
+        method = 'GET'
 
         if context_id == 'btn-random-variant':
             # request a random variant to API
-            data = {'variant_id': -1}  # set id to -1 to request a random variant
-            status, df_selected_variant = api_request(route, method, data, True)
+            # data = {'variant_id': -1}  # set id to -1 to request a random variant
+            route = route + '/nonconf/random'
+            status, df_selected_variant = common.api_request(route, method, True)
 
             # get the ID of the random variant
             selected_variant_id = df_selected_variant.at[0, 'ID']
@@ -268,8 +232,9 @@ def view_variant(sel_rows, n_clicks_view, n_clicks_random):
             print('\nSelected variant:', selected_variant_id)
 
             # request variant data to API
-            data = {'variant_id': int(selected_variant_id)}
-            status, df_selected_variant = api_request(route, method, data, True)
+            # data = {'variant_id': int(selected_variant_id)}
+            route = route + '/' + str(selected_variant_id)
+            status, df_selected_variant = common.api_request(route, method, True)
 
         global expected_label
         expected_label = df_selected_variant.at[0, 'CLNSIG']
@@ -353,11 +318,12 @@ def show_classification_feedback(n_clicks, selected_label):
             is_correct = 0
 
         # send classification data to API
-        route = '/set_user_classification'
+        route = '/users/classifications/save'
         method = 'POST'
-        data = {'user_id': current_user.first, 'variant_id': selected_variant_id, 'label_id': selected_label,
+        data = {'user_id': current_user.user, 'variant_id': selected_variant_id, 'label_id': selected_label,
                 'is_correct': is_correct}
-        status, response = api_request(route, method, data, False)
+        # print(data)
+        status, response = common.api_request(route, method, data, False)
 
         if status == 'ok':
             if is_correct == 1:

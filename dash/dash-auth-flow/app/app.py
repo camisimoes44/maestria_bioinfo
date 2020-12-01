@@ -25,27 +25,13 @@ from pages.auth_pages import (
     change_password,
 )
 
-header = dbc.Navbar(
-    dbc.Container(
-        [
-            dbc.NavbarBrand("Bioinformatics", href="/home"),
-            dbc.Nav(
-                [
-                    dbc.NavItem(dbc.NavLink("Home", href="/home")),
-                    dbc.NavItem(dbc.NavLink("Training", href="/training")),
-                    dbc.NavItem(dbc.NavLink("Classification", href="/classification")),
-                    dbc.NavItem(dbc.NavLink(id='user-name', href='/profile')),
-                    dbc.NavItem(dbc.NavLink('Login', id='user-action', href='Login'))
-                ]
-            )
-        ]
-    ),
-    className="mb-5",
-)
 
 app.layout = html.Div(
     [
-        header,
+        dbc.Navbar(
+            id="navbar",
+            className="mb-5",
+        ),
         html.Div(
             [
                 dbc.Container(
@@ -58,8 +44,41 @@ app.layout = html.Div(
 )
 
 
+def generate_navbar(is_authenticated, user_name):
+    """
+    Generate the navigation bar depending if the user is authenticated or not
+    :param is_authenticated: indicates if the user is authenticated (boolean)
+    :param user_name: name of the user (string)
+    :return: content of the navigation bar (Bootstrap Container)
+    """
+    navbar_items = [dbc.NavItem(dbc.NavLink('Login', id='user-action', href='/login'))]
+    try:
+        if is_authenticated:
+            navbar_items = [
+                dbc.NavItem(dbc.NavLink("Home", href="/home")),
+                dbc.NavItem(dbc.NavLink("Training", href="/training")),
+                dbc.NavItem(dbc.NavLink("Classification", href="/classification")),
+                dbc.NavItem(dbc.NavLink(user_name, id='user-name', href='/profile')),
+                dbc.NavItem(dbc.NavLink('Logout', id='user-action', href='/logout')),
+            ]
+    except:
+        pass
+
+    navbar_content = dbc.Container(
+                [
+                    dbc.NavbarBrand("Bioinformatics", href="/home"),
+                    dbc.Nav(
+                        navbar_items
+                    )
+                ]
+            )
+
+    return navbar_content
+
+
 @app.callback(
-    Output('page-content', 'children'),
+    [Output('page-content', 'children'),
+     Output('navbar', 'children')],
     [Input('base-url', 'pathname')])
 def router(pathname):
     """
@@ -69,16 +88,16 @@ def router(pathname):
     # auth pages
     if pathname == '/login':
         if not current_user.is_authenticated:
-            return login.layout()
+            return login.layout(), generate_navbar(False, '')
     elif pathname == '/register':
         if not current_user.is_authenticated:
-            return register.layout()
+            return register.layout(), generate_navbar(False, '')
     elif pathname == '/change':
         if not current_user.is_authenticated:
-            return change_password.layout()
+            return change_password.layout(), generate_navbar(False, '')
     elif pathname == '/forgot':
         if not current_user.is_authenticated:
-            return forgot_password.layout()
+            return forgot_password.layout(), generate_navbar(False, '')
     elif pathname == '/logout':
         if current_user.is_authenticated:
             logout_user()
@@ -86,23 +105,23 @@ def router(pathname):
     # app pages
     elif pathname == '/' or pathname == '/home' or pathname == '/home':
         if current_user.is_authenticated:
-            return home.layout()
+            return home.layout(), generate_navbar(True, current_user.user)
     elif pathname == '/profile' or pathname == '/profile':
         if current_user.is_authenticated:
-            return profile.layout()
+            return profile.layout(), generate_navbar(True, current_user.user)
     elif pathname == '/classification' or pathname == '/classification':
         if current_user.is_authenticated:
-            return classification.layout()
+            return classification.layout(), generate_navbar(True, current_user.user)
     elif pathname == '/training' or pathname == '/training':
         if current_user.is_authenticated:
-            return training.layout()
+            return training.layout(), generate_navbar(True, current_user.user)
 
     # DEFAULT LOGGED IN: /home
     if current_user.is_authenticated:
-        return home.layout()
+        return home.layout(), generate_navbar(True, current_user.user)
 
     # DEFAULT NOT LOGGED IN: /login
-    return login.layout()
+    return login.layout(), generate_navbar(False, '')
 
 
 @app.callback(
@@ -113,7 +132,7 @@ def profile_link(content):
     returns a navbar link to the user profile if the user is authenticated
     """
     if current_user.is_authenticated:
-        return html.Div(current_user.first)
+        return html.Div(current_user.user)
     else:
         return ''
 

@@ -3,9 +3,7 @@ import dash
 import dash_bootstrap_components as dbc
 
 # global imports
-import os
 from flask_login import LoginManager, UserMixin
-import random
 
 # local imports
 from utilities.auth import db, User as base
@@ -19,8 +17,8 @@ app = dash.Dash(
 
 server = app.server
 app.config.suppress_callback_exceptions = True
-#app.css.config.serve_locally = True
-#app.scripts.config.serve_locally = True
+# app.css.config.serve_locally = True
+# app.scripts.config.serve_locally = True
 app.title = 'Bioinformatics'
 
 # config
@@ -37,13 +35,42 @@ login_manager = LoginManager()
 login_manager.init_app(server)
 login_manager.login_view = '/login'
 
+curr_user = None  # variable to save a User object instance of the current logged in user
+
 
 # Create User class with UserMixin
 class User(UserMixin, base):
-    pass
+    def __init__(self, user):
+        self.id = user['user']
+        self.user = user['user']
+        self.first = user['first']
+        self.last = user['last']
+        self.email = user['email']
+        self.level = user['level']
+        # self.password = user['password']
+
+        self.is_active = True
+        self.is_authenticated = True
+        self.is_anonymous = False  # anonymous users are not allowed
+
+        global curr_user
+        curr_user = self
+
+    def is_active(self):
+        return self.is_active
+
+    def is_authenticated(self):
+        return self.is_authenticated
+
+    def is_anonymous(self):
+        return self.is_anonymous
+
+    def get_id(self):
+        return self.id
 
 
 # callback to reload the user object
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    print('>>> load_user():', str(user_id))
+    return curr_user

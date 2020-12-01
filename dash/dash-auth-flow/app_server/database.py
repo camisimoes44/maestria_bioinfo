@@ -154,3 +154,13 @@ def set_user_classification(user_id, variant_id, label_id, is_correct):
             + "', " + str(variant_id) + ", '" + str(label_id) + "', " + str(is_correct) + ") "
     # print(query)
     return mysql_execute_query(query)
+
+
+def get_user_data(user):
+    """
+    Get the data of a user from database
+    :param user: user name (string)
+    :return: query result (JSON)
+    """
+    query = "SELECT * FROM users WHERE user='" + user + "';"
+    return mysql_execute_query(query)

@@ -1,21 +1,67 @@
+-- phpMyAdmin SQL Dump
+-- version 4.6.3
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: localhost
+-- Tiempo de generación: 27-11-2020 a las 13:09:24
+-- Versión del servidor: 5.7.13
+-- Versión de PHP: 7.3.8
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+--
+-- Base de datos: `bioinfo`
+--
 CREATE DATABASE IF NOT EXISTS `bioinfo` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 USE `bioinfo`;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `expertise_levels`
+--
 
 CREATE TABLE `expertise_levels` (
   `level` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `labels`
+--
+
 CREATE TABLE `labels` (
   `label` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `users`
+--
+
+CREATE TABLE `users` (
+  `user` varchar(30) CHARACTER SET utf8 NOT NULL,
+  `name` varchar(30) CHARACTER SET utf8 NOT NULL,
+  `surname` varchar(30) CHARACTER SET utf8 NOT NULL,
+  `email` varchar(50) CHARACTER SET utf8 NOT NULL,
+  `level` varchar(30) CHARACTER SET utf8 NOT NULL,
+  `password` varchar(150) CHARACTER SET utf8 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_classification`
+--
 
 CREATE TABLE `user_classification` (
   `user_ID` varchar(50) NOT NULL COMMENT 'User associated to classification',
@@ -24,6 +70,12 @@ CREATE TABLE `user_classification` (
   `is_correct` tinyint(1) NOT NULL COMMENT 'Classification result. If =1, the classification was correct',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Date/time of classification'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Represents the classifications of variants made by the users';
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `variants`
+--
 
 CREATE TABLE `variants` (
   `ID` int(11) NOT NULL,
@@ -202,28 +254,54 @@ CREATE TABLE `variants` (
   `is_conflict` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Índices para tablas volcadas
+--
 
+--
+-- Indices de la tabla `expertise_levels`
+--
 ALTER TABLE `expertise_levels`
   ADD PRIMARY KEY (`level`);
 
+--
+-- Indices de la tabla `labels`
+--
 ALTER TABLE `labels`
   ADD PRIMARY KEY (`label`);
 
+--
+-- Indices de la tabla `user_classification`
+--
 ALTER TABLE `user_classification`
   ADD PRIMARY KEY (`user_ID`,`variant_ID`),
   ADD KEY `FK_LabelClassification` (`label_ID`),
   ADD KEY `FK_VariantClassification` (`variant_ID`);
 
+--
+-- Indices de la tabla `variants`
+--
 ALTER TABLE `variants`
-  ADD PRIMARY KEY (`ID`);
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `is_conflict` (`is_conflict`),
+  ADD KEY `CLNSIG` (`CLNSIG`);
 
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
 
+--
+-- AUTO_INCREMENT de la tabla `variants`
+--
 ALTER TABLE `variants`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- Restricciones para tablas volcadas
+--
 
-ALTER TABLE `variants`
-  ADD INDEX(`is_conflict`);
-
+--
+-- Filtros para la tabla `user_classification`
+--
 ALTER TABLE `user_classification`
   ADD CONSTRAINT `FK_LabelClassification` FOREIGN KEY (`label_ID`) REFERENCES `labels` (`label`),
   ADD CONSTRAINT `FK_VariantClassification` FOREIGN KEY (`variant_ID`) REFERENCES `variants` (`ID`);
